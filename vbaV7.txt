@@ -1,0 +1,435 @@
+Dim i As Integer
+Dim j As Integer
+Dim extant As Boolean
+Dim k As Integer
+
+Private Sub CheckAllBox1_Click()
+
+If CheckAllBox1.Value = True Then
+    For i = 0 To TypeListBox1.ListCount - 1
+        TypeListBox1.Selected(i) = True
+    Next i
+End If
+
+If CheckAllBox1.Value = False Then
+    For i = 0 To TypeListBox1.ListCount - 1
+        TypeListBox1.Selected(i) = False
+    Next i
+End If
+
+End Sub
+
+Private Sub CheckAllBox2_Click()
+If CheckAllBox2.Value = True Then
+    For i = 0 To TypeListBox2.ListCount - 1
+        TypeListBox2.Selected(i) = True
+    Next i
+End If
+
+If CheckAllBox2.Value = False Then
+    For i = 0 To TypeListBox2.ListCount - 1
+        TypeListBox2.Selected(i) = False
+    Next i
+End If
+End Sub
+
+Private Sub AddButton_Click()
+
+extant = False
+
+For i = 0 To TypeListBox1.ListCount - 1
+    If TypeListBox1.Selected(i) = True Then
+        For j = 0 To TypeListBox2.ListCount - 1
+            If TypeListBox1.List(i) = TypeListBox2.List(j) Then
+                extant = True
+                Exit For
+            Else
+                extant = False
+            End If
+        Next j
+        If extant = False Then TypeListBox2.AddItem (TypeListBox1.List(i))
+    End If
+Next i
+
+End Sub
+
+Private Sub CancelButton_Click()
+
+Unload Me
+
+End Sub
+
+Private Sub AllDatesCheckBox_Click()
+
+If AllDatesCheckBox.Value = True Then
+    StartDateTextBox.Enabled = False
+    EndDateTextBox.Enabled = False
+End If
+
+If AllDatesCheckBox.Value = False Then
+    StartDateTextBox.Enabled = True
+    EndDateTextBox.Enabled = True
+End If
+
+End Sub
+
+Private Sub ClearButton_Click()
+
+Call UserForm_Initialize
+
+End Sub
+
+Private Sub FilterMTGCheckBox_Click()
+
+End Sub
+
+Private Sub GlendaleCrossSiteCheckBox_Click()
+
+End Sub
+
+Private Sub Label10_Click()
+
+End Sub
+
+Private Sub RemoveButton_Click()
+Dim counter As Integer
+counter = 0
+
+For i = 0 To TypeListBox2.ListCount - 1
+    If TypeListBox2.Selected(i - counter) Then
+        TypeListBox2.RemoveItem (i - counter)
+        counter = counter + 1
+    End If
+Next i
+
+End Sub
+
+Private Sub Label1_Click()
+
+End Sub
+
+Private Sub Label2_Click()
+
+End Sub
+
+Private Sub Label3_Click()
+
+End Sub
+
+Private Sub Label4_Click()
+
+End Sub
+
+Private Sub Label6_Click()
+
+End Sub
+
+Private Sub Label7_Click()
+
+End Sub
+
+Private Sub OKButton_Click()
+
+' Disable prompts
+Application.DisplayAlerts = False
+
+' Get current workbook information
+ThisWBName = ThisWorkbook.Name
+ThisWB = ThisWorkbook.Path & "\" & ThisWBName
+
+' Create new worksheet for results
+Dim ThisWS As Worksheet
+Set ThisWS = Sheets.Add
+nameStr = "Report " & Format(Date, "dd-mm-yy") & "@" & Format(Time, "hh.mm.ss")
+ThisWS.Name = nameStr
+
+'Create header
+createHeader (nameStr)
+
+Cells(2, 1).Select
+
+'Copy GLD Art Dev
+If DnAdGldTextBox.Value <> "" Then
+    OpenAndActivate (DnAdGldTextBox.Value)
+    Call ApplyFilters
+
+    'Copy Results
+    ActiveSheet.AutoFilter.Range.Offset(1).Copy
+    ThisWS.Paste
+    ThisWS.Columns("A:AL").AutoFit
+
+    WBName = Right(DnAdGldTextBox.Value, Len(DnAdGldTextBox.Value) - InStrRev(DnAdGldTextBox.Value, "\"))
+    Workbooks(WBName).Close SaveChanges:=False
+End If
+
+' Set next index
+LastRow = ActiveSheet.UsedRange.Rows.Count
+Cells(LastRow + 1, 1).Select
+
+'Copy RWC Art Dev
+If DnAdRwcTextBox.Value <> "" Then
+    OpenAndActivate (DnAdRwcTextBox.Value)
+    Call ApplyFilters
+
+    'Copy Results
+    ActiveSheet.AutoFilter.Range.Offset(1).Copy
+    ThisWS.Paste
+    ThisWS.Columns("A:AL").AutoFit
+
+    WBName = Right(DnAdRwcTextBox.Value, Len(DnAdRwcTextBox.Value) - InStrRev(DnAdRwcTextBox.Value, "\"))
+    Workbooks(WBName).Close SaveChanges:=False
+End If
+
+' Set next index
+LastRow = ActiveSheet.UsedRange.Rows.Count
+Cells(LastRow + 1, 1).Select
+
+' Copy GLD
+If DnGldTextBox.Value <> "" Then
+    OpenAndActivate (DnGldTextBox.Value)
+    Call ApplyFilters
+
+    'Copy Results
+    ActiveSheet.AutoFilter.Range.Offset(1).Copy
+    ThisWS.Paste
+    ThisWS.Columns("A:AL").AutoFit
+
+    WBName = Right(DnGldTextBox.Value, Len(DnGldTextBox.Value) - InStrRev(DnGldTextBox.Value, "\"))
+    Workbooks(WBName).Close SaveChanges:=False
+End If
+
+' Set next index
+LastRow = ActiveSheet.UsedRange.Rows.Count
+Cells(LastRow + 1, 1).Select
+
+' Copy RWC
+If DnRwcTextBox.Value <> "" Then
+    OpenAndActivate (DnRwcTextBox.Value)
+    Call ApplyFilters
+
+    'Copy Results
+    ActiveSheet.AutoFilter.Range.Offset(1).Copy
+    ThisWS.Paste
+    ThisWS.Columns("A:AL").AutoFit
+
+    WBName = Right(DnRwcTextBox.Value, Len(DnRwcTextBox.Value) - InStrRev(DnRwcTextBox.Value, "\"))
+    Workbooks(WBName).Close SaveChanges:=False
+End If
+
+' Enable prompts
+Application.DisplayAlerts = True
+
+Unload Me
+
+End Sub
+
+Private Sub UserForm_Click()
+
+End Sub
+
+Private Sub UserForm_Initialize()
+
+'Set DnAdGldTextBox
+DnAdGldTextBox.Value = "Z:\work\training\Training_Services\EducationDatabase\2014\ArtDev_GLD_DataNitro_2014\DataNitroArtDev_GLD_2014.xlsx"
+
+'Set DnAdRwcTextBox
+DnAdRwcTextBox.Value = "Z:\work\training\Training_Services\EducationDatabase\2014\ArtDev_RWC_DataNitro_2014\DataNitroArtDev_RWC_2014.xlsx"
+
+'Set DnAdRwcTextBox
+DnGldTextBox.Value = "Z:\work\training\Training_Services\EducationDatabase\2014\GLD_Training_DataNitro_2014\GLD_DataNitro_2014.xlsx"
+
+'Set DnAdRwcTextBox
+DnRwcTextBox.Value = "Z:\work\training\Training_Services\EducationDatabase\2014\RWC_Training_DataNitro_2014\DataNitroRWC_2014.xlsx"
+
+
+'Clear Filter Non Attendees CheckBox
+FilterNonAttendeesCheckBox.Value = False
+
+'Clear GLD Crossite CheckBox
+GlendaleCrossSiteCheckBox.Value = False
+
+'Clear RWC Crossite CheckBox
+RedwoodCityCrossSiteCheckBox.Value = False
+
+'Clear MTG: CheckBox
+FilterMTGCheckBox.Value = False
+
+'Clear Lab Requests: CheckBox
+FilterLabRequestsCheckBox.Value = False
+
+TypeListBox1.Clear
+
+With TypeListBox1
+    .AddItem "#NOT IN CLASS LIST"
+    .AddItem "ArtDev"
+    .AddItem "Animation Technology"
+    .AddItem "CharTD"
+    .AddItem "Flix"
+    .AddItem "Ineligible"
+'    .AddItem "Lab Request"
+'    .AddItem "Mtng"
+    .AddItem "Other"
+    .AddItem "Premo"
+    .AddItem "Prod Management"
+    .AddItem "Recording"
+    .AddItem "Torch"
+    .AddItem "Training"
+    .AddItem "Type"
+    .AddItem "Blanks"
+End With
+
+TypeListBox2.Clear
+
+With ActiveSheet
+        .AutoFilterMode = False
+    End With
+
+End Sub
+
+Private Sub OpenAndActivate(wkbk As String)
+
+If Not wkbk = "" Then
+    Dim wkbk1 As Workbook
+    Set wkbk1 = Workbooks.Open(wkbk)
+    Dim wksh1 As Worksheet
+    Set wksh1 = wkbk1.Sheets("Class Info")
+    wksh1.Activate
+End If
+
+End Sub
+
+Private Sub FilterNonAttendees()
+
+With ActiveSheet
+        .Range("AI6").AutoFilter
+        .Range("AI6").AutoFilter Field:=35, Criteria1:="Yes"
+    End With
+
+End Sub
+
+Private Sub FilterGlendaleCrossSite()
+
+With ActiveSheet
+        .Range("Q6").AutoFilter
+        .Range("Q6").AutoFilter Field:=17, Criteria1:="<>GLD"
+    End With
+    
+End Sub
+
+Public Sub FilterRedwoodCityCrossSite()
+
+With ActiveSheet
+        .Range("Q6").AutoFilter
+        .Range("Q6").AutoFilter Field:=17, Criteria1:="<>RWC"
+    End With
+
+End Sub
+
+Private Sub FilterMTG()
+
+With ActiveSheet
+        .Range("N6").AutoFilter
+        .Range("N6").AutoFilter Field:=14, Criteria1:="<>MTG:*"
+        .Range("N6").AutoFilter Field:=14, Criteria1:="<>Mtg*"
+    End With
+
+End Sub
+
+Private Sub FilterLabRequests()
+
+With ActiveSheet
+        .Range("N6").AutoFilter
+        .Range("N6").AutoFilter Field:=14, Criteria1:="<>Lab Request*"
+    End With
+
+End Sub
+
+Private Sub FilterDates(StartDate As String, EndDate As String)
+Dim MinDate As Date
+Dim MaxDate As Date
+
+MinDate = CDate(StartDate)
+MaxDate = CDate(EndDate)
+
+With ActiveSheet
+        .Range("K6").AutoFilter
+        .Range("K6").AutoFilter Field:=11, Criteria1:=">=" & MinDate, Criteria2:="<=" & MaxDate
+    End With
+
+End Sub
+
+Private Sub FilterTypes(Types As MSForms.ListBox)
+
+For k = 0 To TypeListBox2.ListCount - 1
+    With ActiveSheet
+            .Range("AG6").AutoFilter
+            .Range("AG6").AutoFilter Field:=33, Criteria1:="=" & TypeListBox2.List(k)
+        End With
+Next k
+
+End Sub
+
+Private Sub ApplyFilters()
+
+' Filter Non Attendees
+If FilterNonAttendeesCheckBox.Value = True Then
+    Call FilterNonAttendees
+End If
+
+' Cross Site Filters
+If GlendaleCrossSiteCheckBox.Value = True Then
+    Call FilterGlendaleCrossSite
+End If
+
+If RedwoodCityCrossSiteCheckBox.Value = True Then
+    Call FilterRedwoodCityCrossSite
+End If
+
+' Class Name Filters
+If FilterMTGCheckBox.Value = True Then
+    Call FilterMTG
+End If
+
+If FilterLabRequestsCheckBox.Value = True Then
+    Call FilterLabRequests
+End If
+
+'Filter dates
+If AllDatesCheckBox.Value = False And StartDateTextBox.Value <> "" And EndDateTextBox.Value <> "" Then
+    Call FilterDates(StartDateTextBox.Value, EndDateTextBox.Value)
+End If
+
+'Filter types
+If TypeListBox2.ListCount > 0 Then
+    Call FilterTypes(TypeListBox2)
+End If
+
+End Sub
+
+Private Sub CopyResults(ThisWS As Worksheet)
+
+'Copy Results
+ActiveSheet.AutoFilter.Range.Copy
+ThisWS.Paste
+ThisWS.Columns("A:AL").AutoFit
+
+End Sub
+
+Private Sub CloseWkbk(wkbk As String)
+
+WBName = Right(wkbk, Len(wkbk.Value) - InStrRev(wkbk.Value, "\"))
+Workbooks(WBName).Close SaveChanges:=False
+
+End Sub
+
+Private Sub createHeader(nameStr As String)
+
+headerStr = "Added to Database?,ID #,Trainee Name (Last, First),Department  Title,Show,Location, New Hire,Termed Date,Business Unit,Training Date,Class Length,Roster #,Class Name,Software Version,Customized Class,Cross-Site,Instructor 1 Name,Instructor 1 Location,Instructor 1 Department,Instructor 1 Title,Instructor 1 Show,Instructor 2 Name,Instructor 2 Location,Instructor 2 Department,Instructor 2 Title,Instructor 2 Show,Instructor 3 Name,Instructor 3 Location,Instructor 3 Department,Instructor 3 Title,Instructor 3 Show,Training Type,ETP Type,Attended,Class Size,Lab,Video Jira"
+headerArray = Split(headerStr, ",")
+
+For counter = 1 To UBound(headerArray) + 1
+        Set curCell = Worksheets(nameStr).Cells(1, counter)
+        curCell.Value = headerArray(counter - 1)
+    Next counter
+
+End Sub
